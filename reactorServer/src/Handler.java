@@ -74,12 +74,14 @@ public class Handler implements Runnable {
         try {
             int numBytes = _socketChannel.read(_readBuf);
             System.out.println("read():# bytes read into '_readBuf' buffer =" + numBytes);
+            //读取不到内容，客户端可能已经断开连接
             if (numBytes == -1) {
                 _selectionKey.cancel();
                 _socketChannel.close();
                 System.out.println("read():client connection might have been dropped!");
             }
             else {
+                // 使用线程池执行process函数，处理和客户端的响应
                 ReactorServer.getWorketPool().execute(new Runnable() {
                     public void run() {
                         process();
@@ -102,6 +104,7 @@ public class Handler implements Runnable {
                 _writeBuf.clear();
                 // Set the key's interest-set back to READ operation
                 _selectionKey.interestOps(SelectionKey.OP_READ);
+                // let blocking select() return now can read
                 _selectionKey.selector().wakeup();
             }
         } catch (IOException e) {
