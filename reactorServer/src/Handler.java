@@ -62,6 +62,7 @@ public class Handler implements Runnable {
         System.out.println("the client says: " + new String(input));
         //向客户端发送响应
         byte[] output = process(input);
+        //通过包装一个已有的数组来创建ByteBuffer
         _writeBuf = ByteBuffer.wrap(output);
         _selectionKey.interestOps(SelectionKey.OP_WRITE);
         _selectionKey.selector().wakeup();
