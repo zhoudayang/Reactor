@@ -50,7 +50,7 @@ public class Handler implements Runnable {
     }
     //服务器根据输入input进行响应
     //此处是示例函数,只是简单的返回 hello world
-    byte[] process(byte input[]) {
+    byte[] processInput(byte input[]) {
         String output = "hello world from Server";
         return output.getBytes();
     }
@@ -61,10 +61,12 @@ public class Handler implements Runnable {
         _readBuf.get(input, 0, input.length);
         System.out.println("the client says: " + new String(input));
         //向客户端发送响应
-        byte[] output = process(input);
+        byte[] output = processInput(input);
         //通过包装一个已有的数组来创建ByteBuffer
         _writeBuf = ByteBuffer.wrap(output);
+        //开始向客户端发送内容
         _selectionKey.interestOps(SelectionKey.OP_WRITE);
+        //let blocking select() return
         _selectionKey.selector().wakeup();
     }
 
